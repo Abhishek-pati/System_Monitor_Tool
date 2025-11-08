@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+using namespace std;
+
 struct CPUData {
     unsigned long long user, nice, system, idle;
     unsigned long long total, active;
@@ -17,20 +19,20 @@ struct MemoryInfo {
 
 struct ProcessInfo {
     int pid;
-    std::string user;
-    std::string command;
+    string user;
+    string command;
     float cpuPercent;
     float memPercent;
-    unsigned long memUsage; // in KB
+    unsigned long memUsage;
     char state;
 };
 
 CPUData readCPUStats();
 MemoryInfo readMemoryInfo();
 double getUptime();
-std::vector<int> getProcessPIDs();
+vector<int> getProcessPIDs();
 ProcessInfo readProcessInfo(int pid);
-std::string getProcessUser(int pid);
-void sortProcesses(std::vector<ProcessInfo>&, int);
+string getProcessUser(int pid);
+void sortProcesses(vector<ProcessInfo>&, int);
 
 #endif
