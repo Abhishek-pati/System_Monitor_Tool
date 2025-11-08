@@ -9,6 +9,8 @@
 #include <thread>
 #include <iostream>
 
+using namespace std;
+
 void initializeUI() {
     initscr();
     cbreak();
@@ -29,7 +31,7 @@ void displaySystemInfo() {
              mem.totalMem / 1024);
 }
 
-void displayProcesses(std::vector<ProcessInfo>& processes, int startRow, int selectedRow) {
+void displayProcesses(vector<ProcessInfo>& processes, int startRow, int selectedRow) {
     mvprintw(startRow, 0, "%-8s %-10s %-8s %-10s %-8s %s", "PID", "USER", "STATE", "MEM (KB)", "MEM %", "COMMAND");
     int row = startRow + 1;
     for (size_t i = 0; i < processes.size(); ++i) {
@@ -64,15 +66,15 @@ bool killProcess(int pid) {
 
 int main() {
     initializeUI();
-    int sortMode = 2; // default sort by memory
+    int sortMode = 2;
     int selectedRow = 0;
 
     while (true) {
         clear();
         displaySystemInfo();
 
-        std::vector<int> pids = getProcessPIDs();
-        std::vector<ProcessInfo> processes;
+        vector<int> pids = getProcessPIDs();
+        vector<ProcessInfo> processes;
 
         MemoryInfo mem = readMemoryInfo();
         for (int pid : pids) {
@@ -96,7 +98,7 @@ int main() {
             case KEY_DOWN: if (selectedRow < (int)processes.size() - 1) ++selectedRow; break;
             case 'k': case 'K':
                 if (selectedRow >= 0 && selectedRow < (int)processes.size()) {
-                    bool confirm = true; // add confirmation logic if desired
+                    bool confirm = true;
                     if (confirm) killProcess(processes[selectedRow].pid);
                 }
                 break;
@@ -104,7 +106,7 @@ int main() {
                 endwin();
                 return 0;
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        this_thread::sleep_for(chrono::milliseconds(500));
     }
     endwin();
     return 0;
