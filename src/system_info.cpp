@@ -9,6 +9,8 @@
 #include <pwd.h>
 #include <algorithm>
 
+using namespace std;
+
 CPUData readCPUStats() {
     CPUData data = {0};
     FILE* file = fopen("/proc/stat", "r");
@@ -48,8 +50,8 @@ double getUptime() {
     return uptime;
 }
 
-std::vector<int> getProcessPIDs() {
-    std::vector<int> pids;
+vector<int> getProcessPIDs() {
+    vector<int> pids;
     DIR* dir = opendir("/proc");
     if (dir) {
         struct dirent* entry;
@@ -71,7 +73,6 @@ ProcessInfo readProcessInfo(int pid) {
     proc.memPercent = 0.0;
     proc.memUsage = 0;
     proc.state = '?';
-    // /proc/[pid]/stat
     char statPath[256];
     snprintf(statPath, sizeof(statPath), "/proc/%d/stat", pid);
 
@@ -87,11 +88,10 @@ ProcessInfo readProcessInfo(int pid) {
         fscanf(file, "%ld", &rss);
         fclose(file);
 
-        proc.memUsage = rss * sysconf(_SC_PAGESIZE) / 1024; // KB
+        proc.memUsage = rss * sysconf(_SC_PAGESIZE) / 1024;
         proc.command = comm;
     }
 
-    // /proc/[pid]/cmdline
     char cmdPath[256];
     snprintf(cmdPath, sizeof(cmdPath), "/proc/%d/cmdline", pid);
     file = fopen(cmdPath, "r");
@@ -104,7 +104,7 @@ ProcessInfo readProcessInfo(int pid) {
     return proc;
 }
 
-std::string getProcessUser(int pid) {
+string getProcessUser(int pid) {
     char statusPath[256];
     snprintf(statusPath, sizeof(statusPath), "/proc/%d/status", pid);
 
@@ -124,17 +124,17 @@ std::string getProcessUser(int pid) {
     return "unknown";
 }
 
-void sortProcesses(std::vector<ProcessInfo>& processes, int mode) {
-    if (mode == 0) { // PID
-        std::sort(processes.begin(), processes.end(), [](const ProcessInfo& a, const ProcessInfo& b) {
+void sortProcesses(vector<ProcessInfo>& processes, int mode) {
+    if (mode == 0) {
+        sort(processes.begin(), processes.end(), [](const ProcessInfo& a, const ProcessInfo& b) {
             return a.pid < b.pid;
         });
-    } else if (mode == 1) { // CPU (not implemented fully here as true per-process CPU requires sampling)
-        std::sort(processes.begin(), processes.end(), [](const ProcessInfo& a, const ProcessInfo& b) {
+    } else if (mode == 1) {
+        sort(processes.begin(), processes.end(), [](const ProcessInfo& a, const ProcessInfo& b) {
             return a.cpuPercent > b.cpuPercent;
         });
-    } else if (mode == 2) { // Memory
-        std::sort(processes.begin(), processes.end(), [](const ProcessInfo& a, const ProcessInfo& b) {
+    } else if (mode == 2) {
+        sort(processes.begin(), processes.end(), [](const ProcessInfo& a, const ProcessInfo& b) {
             return a.memUsage > b.memUsage;
         });
     }
